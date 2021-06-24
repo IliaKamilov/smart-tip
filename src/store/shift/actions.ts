@@ -53,6 +53,7 @@ export const getShift = createDraftSafeSelector(selectShift, (state: ShiftPayloa
                         const start = (this.start.getHours() + (this.start.getMinutes() / 60))
                         const end = this.end.getHours() + (this.end.getMinutes() / 60)
                         const hours = (start > end ? (24 - start) + end : (+this.end - +this.start) / 1000 / 3600) || 0
+
                         return hours
                     },
                     get tip() {
