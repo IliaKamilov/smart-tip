@@ -50,8 +50,6 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
 
         if (!employee && employees.find(e => e.name === input.name)) return handleError(`עובד בשם "${input.name}" כבר קיים ברשימה.`)
 
-        return console.log('asd')
-
         setState({ loading: true })
 
         setTimeout(() => {
@@ -95,9 +93,12 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
 
         if (e.currentTarget.name === 'name') {
             const reg = new RegExp(/[א-ת]+$/gi)
+<<<<<<< HEAD
 
             if (!reg.test(e.currentTarget.value)) return handleError('שם חייב להיות באותיות עברית בלבד.')
 
+=======
+>>>>>>> 503e8ff18faa7f5e0d7e1b63cb805cdd56eb59f3
             if (e.currentTarget.value.length > 20) return handleError('שם יכול להכיל 20 תווים בלבד.')
         }
 
