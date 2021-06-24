@@ -50,8 +50,6 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
 
         if (!employee && employees.find(e => e.name === input.name)) return handleError(`עובד בשם "${input.name}" כבר קיים ברשימה.`)
 
-        return console.log('asd')
-
         setState({ loading: true })
 
         setTimeout(() => {
