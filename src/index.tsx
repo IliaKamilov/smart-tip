@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import './index.css'
+import StoreProvider from './store';
+import RTL from './rtl';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <StoreProvider>
+    <RTL>
+      <App />
+    </RTL>
+  </StoreProvider>,
   document.getElementById('root')
 );
 
