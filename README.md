@@ -5,8 +5,6 @@ Common Tip Calculation Web Application
 This project is currently in development. But I have released a beta version. 
 Users can add employees and there work hours including the employee profit. and the app will calculate the total shift hours, perhour wage and other parameters.
 
-## F
-
 ## Inspirasion 
 The project was inspired by  where there is a tip distribution for employees (usually restaurants and bars).
 I built this app to make the calculation time faster, easier, and just smarter.
