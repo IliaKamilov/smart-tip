@@ -82,7 +82,23 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
             onError?.(undefined)
             setState({ loading: false })
         }
-        if (e.currentTarget.name === 'percent') e.currentTarget.value = Number(e.currentTarget.value).toString()
+
+        if (e.currentTarget.name === 'percent') {
+            const percent = Number(e.currentTarget.value)
+
+            if (percent > 100) return handleError('אחוז תשר חייב להיות בין 0-100.')
+
+            e.currentTarget.value = percent.toString()
+        }
+
+        if (e.currentTarget.name === 'name') {
+            const reg = new RegExp(/[א-ת]+$/gi)
+
+            if (!reg.test(e.currentTarget.value)) return handleError('שם חייב להיות באותיות עברית בלבד.')
+
+            if (e.currentTarget.value.length > 20) return handleError('שם יכול להכיל 20 תווים בלבד.')
+        }
+
         setInput({ ...input, [e.currentTarget.name]: e.currentTarget.value })
     }
 
@@ -138,7 +154,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
                                 ampm={false}
                                 value={input.start}
                                 onChange={date => handleTimeChange('start', date)}
-                                invalidDateMessage=""
+                                invalidDateMessage="שעה שגויה."
                             />
                         </div>
                         <div className={classes.field} style={{ flex: 2 }}>
@@ -154,10 +170,10 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
                                 ampm={false}
                                 value={input.end}
                                 onChange={date => handleTimeChange('end', date)}
-                                invalidDateMessage=""
+                                invalidDateMessage="שעה שגויה."
                             />
                         </div>
-                        <div style={{ flex: 1 }}>
+                        <div className={classes.field}>
                             <FormControl disabled style={{ width: '100%' }}>
                                 <InputLabel htmlFor="percent">שעות</InputLabel>
                                 <Input type="number" value={hours.toFixed(2)} />
@@ -188,8 +204,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     field: {
         flex: 1,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        margin: theme.spacing(1, 0)
     },
     input: {
         display: 'flex',
@@ -197,7 +214,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         justifyContent: 'center',
     },
     submit: {
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        margin: theme.spacing(1, 0)
     },
     error: {
         marginBottom: theme.spacing(1)
