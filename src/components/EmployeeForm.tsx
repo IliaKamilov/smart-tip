@@ -93,9 +93,6 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, confirmText, canc
 
         if (e.currentTarget.name === 'name') {
             const reg = new RegExp(/[א-ת]+$/gi)
-
-            if (!reg.test(e.currentTarget.value)) return handleError('שם חייב להיות באותיות עברית בלבד.')
-
             if (e.currentTarget.value.length > 20) return handleError('שם יכול להכיל 20 תווים בלבד.')
         }
 

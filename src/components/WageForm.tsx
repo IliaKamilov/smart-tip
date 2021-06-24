@@ -19,6 +19,10 @@ const WageForm: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const n = Number(e.currentTarget.value)
+        e.currentTarget.value = n.toString()
+
+        if (n > 10000) return
+
         dispatch(setShiftWage({ ...shift.tip, [e.currentTarget.name]: n }))
     }
 
@@ -34,10 +38,11 @@ const WageForm: React.FC = () => {
                 {
                     Object.keys(labels).map((key, i) => (
                         <div key={i} className={classes.field}>
-                            <Typography variant="subtitle2">{labels[key as keyof Shift['tip']]}</Typography>
+                            <Typography variant="subtitle2" className={classes.fieldLabel}>{labels[key as keyof Shift['tip']]}</Typography>
                             <input
                                 type="number"
                                 min="0"
+                                max="9999"
                                 name={key}
                                 value={tip[key as keyof Wage]}
                                 onChange={handleChange}
@@ -64,13 +69,18 @@ const useStyles = makeStyles((theme: Theme) => ({
         textAlign: 'center',
     },
     field: {
-        maxWidth: '35%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+    },
+    fieldLabel: {
+
     },
     input: {
         direction: 'ltr',
         textAlign: 'center',
+        width: '80%',
         fontSize: 18,
         borderRadius: 4,
         border: '1px solid #bbb',
