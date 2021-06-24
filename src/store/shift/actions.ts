@@ -54,7 +54,7 @@ export const getShift = createDraftSafeSelector(selectShift, (state: ShiftPayloa
                         const end = this.end.getHours() + (this.end.getMinutes() / 60)
                         const hours = (start > end ? (24 - start) + end : (+this.end - +this.start) / 1000 / 3600) || 0
 
-                        return hours
+                        return (this.percent / 100) * hours
                     },
                     get tip() {
                         return {
@@ -75,7 +75,7 @@ export const getShift = createDraftSafeSelector(selectShift, (state: ShiftPayloa
                     cash: this.hours > 0 ? this.tip.cash / this.hours : 0,
                     credit: this.hours > 0 ? this.tip.credit / this.hours : 0,
                     get total() {
-                        return this.cash + this.credit
+                        return Math.round(this.cash + this.credit)
                     }
                 }
             }
