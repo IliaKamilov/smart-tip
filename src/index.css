@@ -8,6 +8,7 @@ html, body, #root {
   height: 100%;
   overscroll-behavior: contain;
   user-select: none;
+  z-index: 1;
 }
 
 * {
