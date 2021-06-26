@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles, Theme, Typography } from '@material-ui/core'
+import { Container, makeStyles, Theme, Typography } from '@material-ui/core'
 import { useAppDispatch, useAppSelector } from '../store'
 import { getShift, setShiftWage } from '../store/shift/actions'
 import { MapObject, Shift, Wage } from '../store/shift/types'
@@ -32,33 +32,35 @@ const WageForm: React.FC = () => {
 
     return (
         <div className={classes.root}>
-            {
-                Object.keys(labels).map((key, i) => (
-                    <div key={i} className={classes.item}>
-                        <div className={clsx(classes.symbol, tip[key as keyof Shift['tip']] > 0 && classes.symbolActive)}>
-                            {
-                                key === 'cash'
-                                    ? <LocalAtmOutlined fontSize="inherit" />
-                                    : <PaymentOutlined fontSize="inherit" />
-                            }
+            <Container maxWidth="lg" className={classes.container}>
+                {
+                    Object.keys(labels).map((key, i) => (
+                        <div key={i} className={classes.item}>
+                            <div className={clsx(classes.symbol, tip[key as keyof Shift['tip']] > 0 && classes.symbolActive)}>
+                                {
+                                    key === 'cash'
+                                        ? <LocalAtmOutlined fontSize="inherit" />
+                                        : <PaymentOutlined fontSize="inherit" />
+                                }
+                            </div>
+                            <div className={classes.field}>
+                                <NumberPad
+                                    max={10000}
+                                    value={tip[key as keyof Shift['tip']]}
+                                    onChange={value => handleChange(key as keyof Shift['tip'], value)}
+                                />
+                            </div>
+                            <div className={classes.itemText}>
+                                {
+                                    key === 'cash'
+                                        ? 'מזומן למשמרת'
+                                        : 'אשראי למשמרת'
+                                }
+                            </div>
                         </div>
-                        <div className={classes.field}>
-                            <NumberPad
-                                max={10000}
-                                value={tip[key as keyof Shift['tip']]}
-                                onChange={value => handleChange(key as keyof Shift['tip'], value)}
-                            />
-                        </div>
-                        <div className={classes.itemText}>
-                            {
-                                key === 'cash'
-                                    ? 'מזומן למשמרת'
-                                    : 'אשראי למשמרת'
-                            }
-                        </div>
-                    </div>
-                ))
-            }
+                    ))
+                }
+            </Container>
         </div >
     )
 }
@@ -67,7 +69,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     root: {
         width: '100%',
         display: 'flex',
-        margin: theme.spacing(1, 0),
+        padding: theme.spacing(1, 0),
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        background: '#fff',
+        borderBottom: '1px solid #eaeaea',
+        paddingRight: 6,
+        boxSizing: 'border-box'
+    },
+    container: {
+        display: 'flex',
+        width: '100%',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
     },
@@ -75,7 +87,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         width: '30%'
     },
     field: {
@@ -88,12 +100,15 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'row-reverse',
         fontSize: 20,
         fontWeight: 300,
-        color: '#0089c0',
+        color: '#333',
         borderRadius: theme.shape.borderRadius
     },
     symbol: {
         color: '#bbb',
-        fontSize: 28
+        '& svg': {
+            width: 25,
+            height: 25
+        }
     },
     symbolActive: {
         color: '#0089c0',

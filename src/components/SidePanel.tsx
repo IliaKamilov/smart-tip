@@ -1,7 +1,33 @@
 import React from 'react'
-import { makeStyles, Theme, Typography } from '@material-ui/core'
+import { makeStyles, Theme, Tooltip, Button } from '@material-ui/core'
 import { useAppSelector } from '../store'
 import { getShift } from '../store/shift/actions'
+import { CreditCardOutlined, DragHandleOutlined, LocalAtmOutlined, MonetizationOnOutlined, PauseOutlined, PeopleAltOutlined, ScheduleOutlined } from '@material-ui/icons'
+
+interface ItemProps {
+    title: string
+    value: string | number
+    icon?: React.ReactNode
+    label: string
+}
+
+const SideItem: React.FC<ItemProps> = (props) => {
+    const classes = useStyles()
+    const [open, setOpen] = React.useState<boolean>(false)
+
+    const handleOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
+
+    return (
+        <Tooltip open={open} onClose={handleClose} arrow title={props.label} placement="left">
+            <Button onClick={handleOpen} className={classes.item}>
+                <div className="icon">{props.icon}</div>
+                <div className="value">{props.value}</div>
+                <div className="title">{props.title}</div>
+            </Button>
+        </Tooltip>
+    )
+}
 
 const SidePanel: React.FC = () => {
     const classes = useStyles()
@@ -9,38 +35,43 @@ const SidePanel: React.FC = () => {
 
     if (!shift) return <></>
 
-    const fields: { title: string, subtitle?: string, value: string | number }[] = [
+    const fields: ItemProps[] = [
         {
             title: 'עובדים',
-            value: shift.employees.length
+            value: shift.employees.length,
+            icon: <PeopleAltOutlined />,
+            label: 'סה"כ עובדים במשמרת'
         },
         {
             title: 'שעות',
-            value: shift.hours.toFixed(2)
+            value: shift.hours.toFixed(2),
+            icon: <ScheduleOutlined />,
+            label: 'סה"כ שעות משמרת'
         },
         {
-            title: 'מזומן לשעה',
-            value: shift.perhour.cash.toFixed(2)
+            title: 'מזומן',
+            value: shift.perhour.cash.toFixed(2),
+            icon: <LocalAtmOutlined />,
+            label: 'מזומן לשעה'
         },
         {
-            title: 'אשראי לשעה',
-            value: shift.perhour.credit.toFixed(2)
+            title: 'אשראי',
+            value: shift.perhour.credit.toFixed(2),
+            icon: <CreditCardOutlined />,
+            label: 'אשראי לשעה'
         },
         {
-            title: 'סה"כ לשעה',
-            value: (shift.perhour.cash + shift.perhour.credit).toFixed(2)
+            title: 'סה"כ',
+            value: (shift.perhour.cash + shift.perhour.credit).toFixed(2),
+            icon: <MonetizationOnOutlined />,
+            label: 'סה"כ מזומן ואשראי'
         }
     ]
+
     return (
         <div className={classes.root}>
             {
-                fields.map((field, i) => (
-                    <div className={classes.item} key={i}>
-                        <Typography className="title" variant="body1">{field.title}</Typography>
-                        {field.subtitle && <Typography className="subtitle" variant="caption">{field.subtitle}</Typography>}
-                        <Typography variant="body1" className="value">{field.value}</Typography>
-                    </div>
-                ))
+                fields.map((field, i) => <SideItem key={i} {...field} />)
             }
         </div>
     )
@@ -48,34 +79,38 @@ const SidePanel: React.FC = () => {
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
-        position: 'fixed',
+        position: 'relative',
         height: '100%',
         overflowY: 'auto',
         boxSizing: 'border-box',
-        background: theme.palette.primary.dark,
-        color: theme.palette.getContrastText(theme.palette.primary.dark),
+        background: '#fefefe',
+        color: theme.palette.getContrastText('#fff'),
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
-        width: '15%',
         userSelect: 'none',
-        pointerEvents: 'none'
+        boxShadow: theme.shadows[1],
+        paddingBottom: theme.mixins.toolbar['minHeight']
     },
     item: {
-        padding: theme.spacing(1),
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        textAlign: 'center',
         flexDirection: 'column',
-        '& .title': {
-            fontSize: '11px'
+        padding: theme.spacing(1),
+        '& span': {
+            display: 'flex',
+            flexDirection: 'column'
         },
-        '&:not(:first-child)': {
-            borderTop: '1px solid #000'
+        '& .title, & .icon': {
+            fontSize: '11px',
+            color: '#999'
         },
-        '&:not(:last-child)': {
-            borderBottom: '1px solid #fff'
+        '& .icon svg': {
+            width: 25,
+            height: 25
+        },
+        '& .value': {
+            fontSize: 12
         }
     },
 }))

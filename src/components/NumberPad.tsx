@@ -52,7 +52,7 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
             <div className={classes.padRow}>
                 <div className={classes.padInput}>
                     <div style={{ direction: 'ltr' }}>{input.toLocaleString()}</div>
-                    <div className={classes.padMax}>max {max?.toLocaleString()}</div>
+                    {max && <div className={classes.padMax}>max {max?.toLocaleString()}</div>}
                 </div>
                 <button className={clsx(classes.padItem, classes.backspaceButton)} value={BACKSPACE} onClick={handlePadClick}>
                     <BackspaceOutlined fontSize="inherit" />

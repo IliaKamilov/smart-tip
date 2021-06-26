@@ -22,7 +22,7 @@ const App: React.FC = () => {
 
     return (
         <div className={classes.root}>
-            <AppBar position="relative">
+            <AppBar position="relative" className={classes.appBar}>
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" component="h1">{printDate(shift.date)}</Typography>
                     {/* <Typography variant="h6" component="h1">{shift.type}</Typography> */}
@@ -31,13 +31,8 @@ const App: React.FC = () => {
             <div className={classes.container}>
                 <SidePanel />
                 <div className={classes.main}>
-                    <Container className={classes.wage}>
-                        <WageForm />
-                        <MainAddEmployee />
-                    </Container>
-                    <Container className={classes.content}>
-                        <EmployeesList />
-                    </Container>
+                    <WageForm />
+                    <EmployeesList />
                 </div>
             </div>
         </div>
@@ -53,6 +48,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
         overflow: 'hidden'
     },
+    appBar: {
+        backgroundColor: '#fff',
+        color: theme.palette.getContrastText('#fff'),
+        boxShadow: theme.shadows[1]
+    },
     toolbar: {
         display: 'flex',
         justifyContent: 'space-between'
@@ -61,26 +61,21 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '100%',
         height: '100%',
         display: 'flex',
+        background: '#efefef'
     },
     wage: {
         position: 'relative',
         boxShadow: '1px 1px 3px rgba(0,0,0,.1)',
+        zIndex: 100
     },
     main: {
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
-        marginLeft: '15%',
-        width: '75%',
-        height: '100%'
+        height: '100%',
+        width: '100%',
     },
     content: {
-        overflowY: 'auto',
-        width: '100%',
-        flex: 1,
-        paddingBottom: theme.mixins.toolbar['minHeight'],
-        paddingTop: theme.spacing(1),
-        background: theme.palette.grey[200],
     },
     item: {
         height: '200px',
