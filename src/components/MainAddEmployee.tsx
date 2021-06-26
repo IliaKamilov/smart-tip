@@ -34,8 +34,8 @@ const MainAddEmployee: React.FC = () => {
                 {
                     open &&
                     <div className={clsx(classes.content, open && classes.contentOpen)} style={{ position: 'relative' }}>
-                        <div onClick={handleClose} style={{ zIndex: 1299, inset: 0, top: 0, left: 0, width: '100%', height: '100%', position: 'fixed' }} />
-                        <div style={{ zIndex: 1299, position: 'relative' }}>
+                        <div onClick={handleClose} style={{ inset: 0, top: 0, left: 0, width: '100%', height: '100%', position: 'fixed' }} />
+                        <div style={{ position: 'relative' }}>
                             <EmployeeForm onError={handleError} onConfirm={handleClose} onCancel={handleClose} />
                         </div>
                     </div>

@@ -68,7 +68,7 @@ const EmployeeItem: React.FC<EmployeeItemProps> = ({ employee, current, setCurre
             {
                 isCurrent && <div className={classes.outer} onClick={handleSetCurrent} />
             }
-            <Paper variant="outlined" style={{ padding: 8, margin: '8px 0', zIndex: 1299 }} className={classes.paper}>
+            <Paper variant="outlined" style={{ padding: 8, margin: '8px 0' }} className={classes.paper}>
                 {
                     edit &&
                     <EmployeeForm employee={employee} confirmText="שמור" onConfirm={validateEdited} onCancel={handleSetCurrent} />
@@ -157,7 +157,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 1299
+        // zIndex: 1299
     },
     paper: {
         width: '100%',
@@ -165,7 +165,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         position: 'relative',
         display: 'flex',
         overflow: 'hidden',
-        zIndex: 1300
+        // zIndex: 1300
     },
     content: {
         position: 'relative',
