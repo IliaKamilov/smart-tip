@@ -22,7 +22,7 @@ const CONFIRM = 'CONFIRM'
 
 const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
     const classes = useStyles()
-    const [input, setInput] = React.useState<number>(0)
+    const [input, setInput] = React.useState<number>(value || 0)
 
     const pad = [
         [1, 2, 3],
@@ -45,6 +45,11 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
 
                 return setInput(Number(input + e.currentTarget.value))
         }
+    }
+
+    const getTimeString = () => {
+        const str = input.toString()
+        return str.substring(0, 2) + ':' + str.substring(2, str.length)
     }
 
     return (

@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles, Theme, Tooltip, Button } from '@material-ui/core'
 import { useAppSelector } from '../store'
 import { getShift } from '../store/shift/actions'
-import { CreditCardOutlined, DragHandleOutlined, LocalAtmOutlined, MonetizationOnOutlined, PauseOutlined, PeopleAltOutlined, ScheduleOutlined } from '@material-ui/icons'
+import { CreditCardOutlined, LocalAtmOutlined, MonetizationOnOutlined, PeopleAltOutlined, ScheduleOutlined } from '@material-ui/icons'
 
 interface ItemProps {
     title: string
@@ -73,6 +73,9 @@ const SidePanel: React.FC = () => {
             {
                 fields.map((field, i) => <SideItem key={i} {...field} />)
             }
+            {
+                Array.from({ length: 10 }).map((e, i) => <SideItem key={i} value={i * 10} label="zxc" title="asd" />)
+            }
         </div>
     )
 }
@@ -89,7 +92,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column',
         userSelect: 'none',
         boxShadow: theme.shadows[1],
-        paddingBottom: theme.mixins.toolbar['minHeight']
+        paddingBottom: theme.mixins.toolbar['minHeight'],
     },
     item: {
         display: 'flex',

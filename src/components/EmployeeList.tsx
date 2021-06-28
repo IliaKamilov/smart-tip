@@ -1,50 +1,53 @@
-import { Container, makeStyles, Theme } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
 import React from 'react'
+import { Container, makeStyles, Theme, IconButton, Dialog } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
 import { useAppSelector } from '../store'
 import { getShift } from '../store/shift/actions'
-import { Employee } from '../store/shift/types'
-import EmployeeItem from './EmployeeItem'
+import EmployeeForm from './EmployeeForm'
 
 interface EmployeesListProps {
-}
-
-export interface ItemState {
-    employee: Employee
-    edit?: boolean
-    menu?: boolean
-    delete?: boolean
-    edited?: boolean
-    error?: string
 }
 
 const EmployeesList: React.FC<EmployeesListProps> = () => {
     const classes = useStyles()
     const shift = useAppSelector(getShift)
-    const [current, setCurrent] = React.useState<ItemState | undefined>()
+    const [add, setAdd] = React.useState<boolean>(false)
 
     if (!shift) return <div>לא קיים רישום</div>
 
-    const handleSetCurrent = (state?: ItemState) => {
-        setCurrent(state)
-    }
-
-    const { employees } = shift
+    const handleAddOpen = () => setAdd(true)
+    const handleAddClose = () => setAdd(false)
 
     return (
         <div className={classes.root}>
             <Container className={classes.container}>
-                {
-                    employees.length === 0 &&
-                    <Alert severity="info">להוספת עובדים יש ללחוץ על "הוסף עובד"</Alert>
-                }
-                {
-                    employees.map((employee, i) => (
-                        <div key={i}>
-                            <EmployeeItem current={current} setCurrent={handleSetCurrent} employee={employee} />
+                <div className={classes.row}>
+                    <IconButton
+                        className={classes.addButton}
+                        onClick={handleAddOpen}
+                        disabled={add}
+                    >
+                        <Add />
+                    </IconButton>
+                    <Dialog
+                        open={add}
+                        onClose={handleAddClose}
+                    >
+                        <div className={classes.addForm}>
+                            <EmployeeForm onCancel={handleAddClose} />
                         </div>
-                    ))
-                }
+                    </Dialog>
+                    {/* <Grow
+                        // direction="right"
+                        in={add}
+                        mountOnEnter
+                        unmountOnExit
+                    >
+                        <Paper elevation={4} className={classes.addFormPaper}>
+                            <EmployeeForm onCancel={handleAddClose} />
+                        </Paper>
+                    </Grow> */}
+                </div>
             </Container>
         </div>
     )
@@ -53,13 +56,27 @@ const EmployeesList: React.FC<EmployeesListProps> = () => {
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         overflowY: 'auto',
+        overflowX: 'hidden',
         width: '100%',
+        height: '100%',
         flex: 1,
         paddingBottom: theme.mixins.toolbar['minHeight'],
         marginBottom: 20,
         paddingTop: theme.spacing(1),
     },
     container: {
+    },
+    row: {
+        display: 'flex',
+        width: '100%',
+        position: 'relative'
+    },
+    addButton: {
+        margin: theme.spacing(1, 'auto'),
+        border: '1px solid rgba(0,0,0,0.54)'
+    },
+    addForm: {
+        padding: theme.spacing(1, 2)
     }
 }))
 

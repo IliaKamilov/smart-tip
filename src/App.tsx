@@ -1,8 +1,7 @@
 import { makeStyles, Theme, AppBar, Toolbar, Typography, Container } from '@material-ui/core'
 import React from 'react'
-import { useAppDispatch, useAppSelector } from './store'
-import { getShift, setShiftWage } from './store/shift/actions'
-import MainAddEmployee from './components/MainAddEmployee'
+import { useAppSelector } from './store'
+import { getShift } from './store/shift/actions'
 import EmployeesList from './components/EmployeeList'
 import SidePanel from './components/SidePanel'
 import WageForm from './components/WageForm'
@@ -22,12 +21,13 @@ const App: React.FC = () => {
 
     return (
         <div className={classes.root}>
-            <AppBar position="relative" className={classes.appBar}>
+            <AppBar position="fixed" className={classes.appBar}>
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h6" component="h1">{printDate(shift.date)}</Typography>
                     {/* <Typography variant="h6" component="h1">{shift.type}</Typography> */}
                 </Toolbar>
             </AppBar>
+            <Toolbar />
             <div className={classes.container}>
                 <SidePanel />
                 <div className={classes.main}>
@@ -41,7 +41,7 @@ const App: React.FC = () => {
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
-        width: '100vw',
+        width: '100%',
         height: '100%',
         position: 'relative',
         display: 'flex',
@@ -60,8 +60,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     container: {
         width: '100%',
         height: '100%',
+        position: 'relative',
+        flex: 1,
         display: 'flex',
-        background: '#efefef'
+        background: '#efefef',
     },
     wage: {
         position: 'relative',
