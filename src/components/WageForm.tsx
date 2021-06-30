@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles, Theme, Typography } from '@material-ui/core'
+import { Container, makeStyles, Theme } from '@material-ui/core'
 import { useAppDispatch, useAppSelector } from '../store'
 import { getShift, setShiftWage } from '../store/shift/actions'
 import { MapObject, Shift, Wage } from '../store/shift/types'
@@ -11,54 +11,51 @@ const WageForm: React.FC = () => {
     const classes = useStyles()
     const shift = useAppSelector(getShift)
     const dispatch = useAppDispatch()
+    const [open, setOpen] = React.useState<{ target: HTMLElement, label: 'cash' | 'credit' } | null>(null)
 
     if (!shift) return <></>
 
     const tip = shift.tip as MapObject<Wage>
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-    }
-
     const handleChange = (target: keyof Shift['tip'], value: number) => {
         dispatch(setShiftWage({ ...shift.tip, [target]: value }))
-    }
-
-    const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.currentTarget.name === 'credit' && e.key === 'Enter') return e.currentTarget.blur()
+        setOpen(null)
     }
 
     const labels: MapObject<{ [key in keyof Wage]: string }> = { cash: 'מזומן למשמרת', credit: 'אשראי למשמרת' }
 
+    const isOpen = (target: keyof Shift['tip']) => {
+        if (!open) return undefined
+
+        if (open.label === target) return open.target
+    }
+
     return (
         <div className={classes.root}>
-            {
-                Object.keys(labels).map((key, i) => (
-                    <div key={i} className={classes.item}>
-                        <div className={clsx(classes.symbol, tip[key as keyof Shift['tip']] > 0 && classes.symbolActive)}>
-                            {
-                                key === 'cash'
-                                    ? <LocalAtmOutlined fontSize="inherit" />
-                                    : <PaymentOutlined fontSize="inherit" />
-                            }
-                        </div>
-                        <div className={classes.field}>
+            <Container maxWidth="lg" className={classes.container}>
+                {
+                    Object.keys(labels).map((key, i) => (
+                        <div key={i} className={clsx(classes.field, tip[key as keyof Shift['tip']] > 0 && classes.active)}>
                             <NumberPad
+                                open={isOpen(key as keyof Shift['tip'])}
                                 max={10000}
                                 value={tip[key as keyof Shift['tip']]}
                                 onChange={value => handleChange(key as keyof Shift['tip'], value)}
+                                icon={
+                                    key === 'cash'
+                                        ? <LocalAtmOutlined className={clsx(classes.icon, tip[key as keyof Shift['tip']] > 0 && classes.active)} fontSize="inherit" />
+                                        : <PaymentOutlined className={clsx(classes.icon, tip[key as keyof Shift['tip']] > 0 && classes.active)} fontSize="inherit" />
+                                }
+                                label={
+                                    key === 'cash'
+                                        ? 'מזומן משמרת'
+                                        : 'אשראי משמרת'
+                                }
                             />
                         </div>
-                        <div className={classes.itemText}>
-                            {
-                                key === 'cash'
-                                    ? 'מזומן למשמרת'
-                                    : 'אשראי למשמרת'
-                            }
-                        </div>
-                    </div>
-                ))
-            }
+                    ))
+                }
+            </Container>
         </div >
     )
 }
@@ -66,41 +63,48 @@ const WageForm: React.FC = () => {
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         width: '100%',
+        height: '100px',
+        position: 'relative',
         display: 'flex',
-        margin: theme.spacing(1, 0),
+        flex: 1,
+        padding: theme.spacing(1, 0),
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: '#fff',
+        borderBottom: '1px solid #eaeaea',
+        paddingRight: 6,
+        // boxSizing: 'border-box',
+    },
+    container: {
+        display: 'flex',
+        width: '100%',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
     },
-    item: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '30%'
-    },
     field: {
         width: '100%',
+        margin: theme.spacing(0, 2),
         boxSizing: 'border-box',
-        border: '1px solid #bbb',
+        border: '1px solid #ebebeb',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         flexDirection: 'row-reverse',
         fontSize: 20,
         fontWeight: 300,
-        color: '#0089c0',
+        color: '#333',
         borderRadius: theme.shape.borderRadius
     },
-    symbol: {
+    icon: {
         color: '#bbb',
-        fontSize: 28
+        width: 25,
+        height: 25
     },
-    symbolActive: {
-        color: '#0089c0',
+    active: {
+        color: '#0089c0!important',
     },
     itemText: {
         fontSize: 13,
-        color: '#bbb'
+        color: '#bbb',
+        textAlign: 'center'
     }
 }))
 

@@ -27,7 +27,7 @@ html, body, #root {
 }
 
 #root {
-    position: absolute;
+    /* position: absolute; */
 }
 
 input::-webkit-outer-spin-button, 
@@ -41,4 +41,20 @@ input[type="number"] {
     appearance: none;
     -moz-appearance: none;
     direction: 'ltr'
+}
+
+.MuiTooltip-tooltip {
+    margin: 0!important;
+}
+.MuiTooltip-tooltipPlacementBottom {
+    margin-top: 4px!important;
+}
+.MuiTooltip-tooltipPlacementRight {
+    margin-left: 4px!important;
+}
+.MuiTooltip-tooltipPlacementLeft {
+    margin-right: 4px!important;
+}
+.MuiTooltip-tooltipPlacementTop {
+    margin-bottom: 4px!important;
 }
