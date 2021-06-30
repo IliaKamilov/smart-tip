@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     container: {
         display: 'flex',
         width: '100%',
-        alignItems: 'flex-start',
+        alignItems: 'stretch',
         justifyContent: 'space-between',
     },
     field: {
