@@ -4,6 +4,7 @@ import { Add } from '@material-ui/icons'
 import { useAppSelector } from '../store'
 import { getShift } from '../store/shift/actions'
 import EmployeeForm from './EmployeeForm'
+import EmployeeItem, { SlideUpTransition } from './EmployeeItem'
 
 interface EmployeesListProps {
 }
@@ -19,7 +20,7 @@ const EmployeesList: React.FC<EmployeesListProps> = () => {
     const handleAddClose = () => setAdd(false)
 
     return (
-        <div className={classes.root}>
+        <>
             <Container className={classes.container}>
                 <div className={classes.row}>
                     <IconButton
@@ -32,51 +33,46 @@ const EmployeesList: React.FC<EmployeesListProps> = () => {
                     <Dialog
                         open={add}
                         onClose={handleAddClose}
+                        TransitionComponent={SlideUpTransition}
                     >
-                        <div className={classes.addForm}>
-                            <EmployeeForm onCancel={handleAddClose} />
-                        </div>
+                        <EmployeeForm onSuccess={handleAddClose} onCancel={handleAddClose} />
                     </Dialog>
-                    {/* <Grow
-                        // direction="right"
-                        in={add}
-                        mountOnEnter
-                        unmountOnExit
-                    >
-                        <Paper elevation={4} className={classes.addFormPaper}>
-                            <EmployeeForm onCancel={handleAddClose} />
-                        </Paper>
-                    </Grow> */}
                 </div>
+                {
+                    shift.employees.map((employee, i) => <EmployeeItem key={i} employee={employee} />)
+                }
             </Container>
-        </div>
+        </>
     )
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
         overflowY: 'auto',
         overflowX: 'hidden',
         width: '100%',
-        height: '100%',
-        flex: 1,
-        paddingBottom: theme.mixins.toolbar['minHeight'],
-        marginBottom: 20,
-        paddingTop: theme.spacing(1),
     },
     container: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1
     },
     row: {
         display: 'flex',
         width: '100%',
-        position: 'relative'
+        position: 'relative',
+        minHeight: 50,
+        margin: theme.spacing(.5, 0)
     },
     addButton: {
         margin: theme.spacing(1, 'auto'),
         border: '1px solid rgba(0,0,0,0.54)'
     },
     addForm: {
-        padding: theme.spacing(1, 2)
+        // padding: theme.spacing(1, 2)
     }
 }))
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles, Theme, Tooltip, Button } from '@material-ui/core'
 import { useAppSelector } from '../store'
 import { getShift } from '../store/shift/actions'
-import { CreditCardOutlined, LocalAtmOutlined, MonetizationOnOutlined, PeopleAltOutlined, ScheduleOutlined } from '@material-ui/icons'
+import { CreditCardOutlined, LocalAtmOutlined, AlarmOnOutlined, PeopleAltOutlined, ScheduleOutlined } from '@material-ui/icons'
 
 interface ItemProps {
     title: string
@@ -63,7 +63,7 @@ const SidePanel: React.FC = () => {
         {
             title: 'סה"כ',
             value: (shift.perhour.cash + shift.perhour.credit).toFixed(2),
-            icon: <MonetizationOnOutlined />,
+            icon: <AlarmOnOutlined />,
             label: 'סה"כ מזומן ואשראי'
         }
     ]
@@ -73,9 +73,9 @@ const SidePanel: React.FC = () => {
             {
                 fields.map((field, i) => <SideItem key={i} {...field} />)
             }
-            {
+            {/* {
                 Array.from({ length: 10 }).map((e, i) => <SideItem key={i} value={i * 10} label="zxc" title="asd" />)
-            }
+            } */}
         </div>
     )
 }
@@ -86,20 +86,20 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: '100%',
         overflowY: 'auto',
         boxSizing: 'border-box',
-        background: '#fefefe',
+        background: '#fff',
         color: theme.palette.getContrastText('#fff'),
+        borderRight: '1px solid #eaeaea',
         display: 'flex',
         flexDirection: 'column',
         userSelect: 'none',
-        boxShadow: theme.shadows[1],
-        paddingBottom: theme.mixins.toolbar['minHeight'],
+        overflowX: 'hidden'
     },
     item: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        padding: theme.spacing(1),
+        padding: theme.spacing(1, 2),
         '& span': {
             display: 'flex',
             flexDirection: 'column'

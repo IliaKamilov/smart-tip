@@ -1,27 +1,29 @@
-import { makeStyles, Popover, Theme } from '@material-ui/core'
+import { makeStyles, Popover, Theme, Button } from '@material-ui/core'
 import { BackspaceOutlined, Done } from '@material-ui/icons'
 import React from 'react'
-import NumberPad from './NumberPad'
 import clsx from 'clsx'
 
 interface TimePadProps {
-    value?: number
-    onChange?: (value: number) => void
+    value?: string
+    onChange?: (value: [number, number, number, number]) => void
+    icon?: React.ReactNode
+    label?: string
+    id?: string
 }
 
 interface PadProps {
     value?: [string, string]
+    label?: string
     onConfirm?: (value: [string, string]) => void
 }
 
-const BACKSPACE = 'BACKSPACE'
-const CLEAR = 'CLEAR'
-const CONFIRM = 'CONFIRM'
+const BACKSPACE = 'Backspace'
+const CLEAR = 'Delete'
+const CONFIRM = 'Enter'
 
-const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
+const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
     const classes = useStyles()
-    const [time, setTime] = React.useState<[string, string]>(['00', '00'])
-    const [current, setCurrent] = React.useState<number>(0)
+    const [time, setTime] = React.useState<[string, string]>(value || ['00', '00'])
     const [editing, setEditing] = React.useState<'hour' | 'min'>('hour')
     const [focus, setFocus] = React.useState<'hour' | 'min' | undefined>(undefined)
 
@@ -32,11 +34,41 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
         [CLEAR, 0, CONFIRM]
     ]
 
-    const withZero = (v: number): string => v > 10 ? v.toString() : `0${v}`
+    React.useEffect(() => {
+        document.addEventListener('keyup', handleKeyUp)
+
+        return () => document.removeEventListener('keyup', handleKeyUp)
+    })
+
+    function handleKeyUp(this: Document, ev: KeyboardEvent) {
+        const key = isNaN(Number(ev.key)) ? ev.key : Number(ev.key)
+        const isValid = Boolean(Array.from(pad, r => r.includes(key)).find(b => b === true)) || [CLEAR, BACKSPACE].includes(key.toString())
+
+        if (isValid) {
+            const button = document.getElementById(key.toString())
+            button?.click()
+        }
+    }
 
     const handlePadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (e.currentTarget.value === BACKSPACE) {
+            if (time[1]) {
+                setEditing('min')
+                time[1] = time[1].slice(0, -1)
+            } else {
+                setEditing('hour')
+                time[0] = time[0].slice(0, -1)
+            }
+            return setTime([time[0], time[1]])
+        }
         if (editing === 'hour') {
+            if (e.currentTarget.value === BACKSPACE) return setTime([time[0].slice(0, -1), time[1]])
+            if (e.currentTarget.value === CLEAR) return setTime(['', time[1]])
             if (e.currentTarget.value === CONFIRM) {
+                if (time[0] === '') {
+                    setTime(['00', time[1] || '00'])
+                    return onConfirm?.(['00', time[1] || '00'])
+                }
                 setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
                 return setEditing('min')
             }
@@ -62,6 +94,11 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
                         return setTime([value.toString(), time[1]])
                     }
 
+                    if (value > 2 && !focus) {
+                        setEditing('min')
+                        return setTime([value < 10 ? `0${value.toString()}` : value.toString(), time[1]])
+                    }
+
                     if (value > 2) return console.log('asd')
                 }
 
@@ -82,7 +119,14 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
             }
         }
         if (editing === 'min') {
+            if (e.currentTarget.value === BACKSPACE) {
+                if (time[1] === '') setEditing('hour')
+                return setTime([time[0], time[1].slice(0, -1)])
+            }
+            if (e.currentTarget.value === CLEAR) return setTime([time[0], ''])
             if (e.currentTarget.value === CONFIRM) {
+                time[0] = time[0] || '0'
+                time[1] = time[1] || '0'
                 setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
                 return onConfirm?.([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
             }
@@ -113,12 +157,13 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
             <div className={classes.padRow}>
                 <div className={classes.padInput}>
                     <div style={{ direction: 'ltr', display: 'flex' }}>
-                        <div onClick={() => handleClick('hour')} style={{ background: editing === 'hour' ? 'yellow' : 'transparent' }}>{time[0]}</div>
+                        <div onClick={() => handleClick('hour')} style={{ background: editing === 'hour' ? '#efefef' : 'transparent' }}>{time[0]}</div>
                         :
-                        <div onClick={() => handleClick('min')} style={{ background: editing === 'min' ? 'yellow' : 'transparent' }}>{time[1]}</div>
+                        <div onClick={() => handleClick('min')} style={{ background: editing === 'min' ? '#efefef' : 'transparent' }}>{time[1]}</div>
                     </div>
+                    <div className={classes.padLabel}>{label}</div>
                 </div>
-                <button className={clsx(classes.padItem, classes.backspaceButton)} value={BACKSPACE} onClick={handlePadClick}>
+                <button id={BACKSPACE} className={clsx(classes.padItem, classes.backspaceButton)} value={BACKSPACE} onClick={handlePadClick}>
                     <BackspaceOutlined fontSize="inherit" />
                 </button>
             </div>
@@ -132,6 +177,7 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
                                     className={clsx(classes.padItem, pad === CONFIRM && classes.confirmItem, pad === CLEAR && classes.clearItem)}
                                     value={pad}
                                     onClick={handlePadClick}
+                                    id={pad.toString()}
                                 >
                                     {
                                         typeof pad === 'number' && pad.toString()
@@ -152,38 +198,48 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm }) => {
     )
 }
 
-const TimePad: React.FC<TimePadProps> = ({ value, onChange }) => {
+const TimePad: React.FC<TimePadProps> = ({ value, onChange, icon, label, id }) => {
     const classes = useStyles()
-    const [time, setTime] = React.useState<[string, string]>(['00', '00'])
+    const [time, setTime] = React.useState<[string, string]>(value?.split(':') as [string, string] || ['00', '00'])
     const [anchor, setAnchor] = React.useState<HTMLElement | null>(null)
-
-    const handleChange = (value: string) => {
-    }
 
     const handleOpen = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget)
     const handleClose = () => setAnchor(null)
 
     const handleTimeConfirm = (value: [string, string]) => {
         setTime(value)
+        handleChange(value)
         handleClose()
+    }
+
+    const handleChange = (value?: [string, string]) => {
+        const t = value ? value.map(str => Number(str)) : [Number(time[0]), Number(time[1])]
+        const hours: [number, number, number, number] = [t[0], t[1], 0, 0]
+        onChange?.(hours)
     }
 
     const open = Boolean(anchor)
 
     return (
         <div className={classes.root}>
-            <div
+            <Button
                 className={classes.input}
                 onClick={handleOpen}
+                style={{ fontSize: 18 }}
+                id={id}
             >
-                {time[0]}:{time[1]}
-            </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    {icon}
+                    <div>{time[0]}:{time[1]}</div>
+                    {label && <span className={classes.label}>{label}</span>}
+                </div>
+            </Button>
             <Popover
                 open={open}
                 anchorEl={anchor}
                 onClose={handleClose}
             >
-                <Pad onConfirm={handleTimeConfirm} />
+                <Pad label={label} value={time} onConfirm={handleTimeConfirm} />
             </Popover>
         </div>
     )
@@ -249,6 +305,16 @@ const useStyles = makeStyles((theme: Theme) => ({
         fontSize: 28,
     },
     clearItem: {
+    },
+    label: {
+        color: '#999',
+        fontSize: 11
+    },
+    padLabel: {
+        position: 'absolute',
+        color: '#999',
+        fontSize: 12,
+        bottom: 2
     }
 }))
 

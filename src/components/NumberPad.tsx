@@ -1,55 +1,72 @@
 import React from 'react'
-import { makeStyles, Theme, Popover } from '@material-ui/core'
-import { BackspaceOutlined, Done } from '@material-ui/icons'
+import { makeStyles, Theme, Popover, Button } from '@material-ui/core'
+import { BackspaceOutlined, CancelRounded, Done } from '@material-ui/icons'
 import clsx from 'clsx'
 
 interface NumberPadProps {
+    open?: HTMLElement
     value?: number
     label?: string
+    icon?: React.ReactNode
     onChange?: (value: number) => void
     max?: number
+    id?: string
 }
 
 interface PadProps {
     value?: number
     onConfirm?: (value: number) => void
     max?: number
+    label?: string
 }
 
-const BACKSPACE = 'BACKSPACE'
-const CLEAR = 'CLEAR'
-const CONFIRM = 'CONFIRM'
+const BACKSPACE = 'Backspace'
+const CLEAR = 'Delete'
+const CONFIRM = 'Enter'
 
-const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
+const Pad: React.FC<PadProps> = ({ value, onConfirm, max, label }) => {
     const classes = useStyles()
-    const [input, setInput] = React.useState<number>(value || 0)
+    const [input, setInput] = React.useState<string>(value?.toString() || '0')
 
     const pad = [
         [1, 2, 3],
         [4, 5, 6],
         [7, 8, 9],
-        [CLEAR, 0, CONFIRM]
+        ['.', 0, CONFIRM]
     ]
+
+    React.useEffect(() => {
+        document.addEventListener('keyup', handleKeyUp)
+
+        return () => document.removeEventListener('keyup', handleKeyUp)
+    })
+
+    function handleKeyUp(this: Document, ev: KeyboardEvent) {
+        const key = isNaN(Number(ev.key)) ? ev.key : Number(ev.key)
+        const isValid = Boolean(Array.from(pad, r => r.includes(key)).find(b => b === true)) || [CLEAR, BACKSPACE].includes(key.toString())
+
+        if (isValid) {
+            const button = document.getElementById(key.toString())
+            button?.click()
+        }
+    }
 
     const handlePadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         max = max || 9999
         switch (e.currentTarget.value) {
             case BACKSPACE:
-                return setInput(Number(input.toString().slice(0, -1)))
+                return setInput(input.toString().slice(0, -1))
             case CLEAR:
-                return setInput(0)
+                return setInput('0')
             case CONFIRM:
-                return onConfirm?.(input)
+                return onConfirm?.(Number(input))
+            case '.':
+                return setInput(`${input}.`)
             default:
-                if (Number(input + e.currentTarget.value) > max) return setInput(max)
+                if (Number(input + e.currentTarget.value) > max) return setInput(max.toString())
 
-                return setInput(Number(input + e.currentTarget.value))
+                return setInput(Number(input + e.currentTarget.value).toString())
         }
-    }
-
-    const getTimeString = () => {
-        const str = input.toString()
-        return str.substring(0, 2) + ':' + str.substring(2, str.length)
     }
 
     return (
@@ -57,9 +74,16 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
             <div className={classes.padRow}>
                 <div className={classes.padInput}>
                     <div style={{ direction: 'ltr' }}>{input.toLocaleString()}</div>
-                    {max && <div className={classes.padMax}>max {max?.toLocaleString()}</div>}
+                    {label && <div className={classes.padMax}>{label}</div>}
+                    {!label && max && <div className={classes.padMax}>max {max?.toLocaleString()}</div>}
                 </div>
-                <button className={clsx(classes.padItem, classes.backspaceButton)} value={BACKSPACE} onClick={handlePadClick}>
+                {
+                    input !== '' && input !== '0' &&
+                    <button className={clsx(classes.actionButton)} id={CLEAR} value={CLEAR} onClick={handlePadClick}>
+                        <CancelRounded fontSize="inherit" />
+                    </button>
+                }
+                <button className={clsx(classes.actionButton)} id={BACKSPACE} value={BACKSPACE} onClick={handlePadClick}>
                     <BackspaceOutlined fontSize="inherit" />
                 </button>
             </div>
@@ -73,7 +97,11 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
                                     className={clsx(classes.padItem, pad === CONFIRM && classes.confirmItem, pad === CLEAR && classes.clearItem)}
                                     value={pad}
                                     onClick={handlePadClick}
+                                    id={pad.toString()}
                                 >
+                                    {
+                                        pad === '.' && '.'
+                                    }
                                     {
                                         typeof pad === 'number' && pad.toString()
                                     }
@@ -93,7 +121,7 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max }) => {
     )
 }
 
-const NumberPad: React.FC<NumberPadProps> = ({ value, onChange, max }) => {
+const NumberPad: React.FC<NumberPadProps> = ({ value, onChange, max, label, icon, id }) => {
     const classes = useStyles()
     const [anchor, setAnchor] = React.useState<HTMLElement | null>(null)
     const [input, setInput] = React.useState<number>(value || 0)
@@ -111,18 +139,32 @@ const NumberPad: React.FC<NumberPadProps> = ({ value, onChange, max }) => {
 
     return (
         <div className={classes.root}>
-            <div
+            <Button
+                id={id}
                 className={classes.input}
                 onClick={handleOpen}
+                style={{ fontSize: 18 }}
             >
-                {input.toLocaleString()}
-            </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    {icon}
+                    <div>{input.toLocaleString()}</div>
+                    {label && <span className={classes.label}>{label}</span>}
+                </div>
+            </Button>
             <Popover
                 open={open}
                 anchorEl={anchor}
                 onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
             >
-                <Pad max={max} value={input} onConfirm={handleConfirm} />
+                <Pad label={label} max={max} value={input} onConfirm={handleConfirm} />
             </Popover>
         </div>
     )
@@ -133,9 +175,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     input: {
-        cursor: 'text',
         width: '100%',
-        textAlign: 'center'
+        color: 'inherit'
     },
     pad: {
         display: 'flex',
@@ -167,7 +208,8 @@ const useStyles = makeStyles((theme: Theme) => ({
             borderLeft: '1px solid #efefef'
         }
     },
-    padItemIcon: {
+    padIcon: {
+        color: 'inherit'
     },
     padInput: {
         display: 'flex',
@@ -185,13 +227,23 @@ const useStyles = makeStyles((theme: Theme) => ({
         fontSize: 10,
         color: '#999',
     },
-    backspaceButton: {
+    actionButton: {
+        height: 75,
+        border: 0,
+        background: 'transparent',
+        color: '#999',
+        fontSize: 24,
+        outline: 'none'
     },
     confirmItem: {
         color: theme.palette.info.main,
         fontSize: 28,
     },
     clearItem: {
+    },
+    label: {
+        color: '#999',
+        fontSize: 11
     }
 }))
 

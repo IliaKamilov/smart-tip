@@ -11,6 +11,7 @@ const WageForm: React.FC = () => {
     const classes = useStyles()
     const shift = useAppSelector(getShift)
     const dispatch = useAppDispatch()
+    const [open, setOpen] = React.useState<{ target: HTMLElement, label: 'cash' | 'credit' } | null>(null)
 
     if (!shift) return <></>
 
@@ -18,37 +19,39 @@ const WageForm: React.FC = () => {
 
     const handleChange = (target: keyof Shift['tip'], value: number) => {
         dispatch(setShiftWage({ ...shift.tip, [target]: value }))
+        setOpen(null)
     }
 
     const labels: MapObject<{ [key in keyof Wage]: string }> = { cash: 'מזומן למשמרת', credit: 'אשראי למשמרת' }
+
+    const isOpen = (target: keyof Shift['tip']) => {
+        if (!open) return undefined
+
+        if (open.label === target) return open.target
+    }
 
     return (
         <div className={classes.root}>
             <Container maxWidth="lg" className={classes.container}>
                 {
                     Object.keys(labels).map((key, i) => (
-                        <div key={i} className={classes.item}>
-                            <div className={clsx(classes.symbol, tip[key as keyof Shift['tip']] > 0 && classes.active)}>
-                                {
+                        <div key={i} className={clsx(classes.field, tip[key as keyof Shift['tip']] > 0 && classes.active)}>
+                            <NumberPad
+                                open={isOpen(key as keyof Shift['tip'])}
+                                max={10000}
+                                value={tip[key as keyof Shift['tip']]}
+                                onChange={value => handleChange(key as keyof Shift['tip'], value)}
+                                icon={
                                     key === 'cash'
-                                        ? <LocalAtmOutlined fontSize="inherit" />
-                                        : <PaymentOutlined fontSize="inherit" />
+                                        ? <LocalAtmOutlined className={clsx(classes.icon, tip[key as keyof Shift['tip']] > 0 && classes.active)} fontSize="inherit" />
+                                        : <PaymentOutlined className={clsx(classes.icon, tip[key as keyof Shift['tip']] > 0 && classes.active)} fontSize="inherit" />
                                 }
-                            </div>
-                            <div className={clsx(classes.field, tip[key as keyof Shift['tip']] > 0 && classes.active)}>
-                                <NumberPad
-                                    max={10000}
-                                    value={tip[key as keyof Shift['tip']]}
-                                    onChange={value => handleChange(key as keyof Shift['tip'], value)}
-                                />
-                            </div>
-                            <div className={classes.itemText}>
-                                {
+                                label={
                                     key === 'cash'
-                                        ? 'מזומן למשמרת'
-                                        : 'אשראי למשמרת'
+                                        ? 'מזומן משמרת'
+                                        : 'אשראי משמרת'
                                 }
-                            </div>
+                            />
                         </div>
                     ))
                 }
@@ -60,14 +63,17 @@ const WageForm: React.FC = () => {
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         width: '100%',
+        height: '100px',
+        position: 'relative',
         display: 'flex',
+        flex: 1,
         padding: theme.spacing(1, 0),
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'space-between',
         background: '#fff',
         borderBottom: '1px solid #eaeaea',
         paddingRight: 6,
-        boxSizing: 'border-box'
+        // boxSizing: 'border-box',
     },
     container: {
         display: 'flex',
@@ -75,39 +81,30 @@ const useStyles = makeStyles((theme: Theme) => ({
         alignItems: 'flex-start',
         justifyContent: 'space-between',
     },
-    item: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '30%'
-    },
     field: {
         width: '100%',
+        margin: theme.spacing(0, 2),
         boxSizing: 'border-box',
-        border: '1px solid #bbb',
+        border: '1px solid #ebebeb',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         flexDirection: 'row-reverse',
         fontSize: 20,
         fontWeight: 300,
         color: '#333',
         borderRadius: theme.shape.borderRadius
     },
-    symbol: {
+    icon: {
         color: '#bbb',
-        '& svg': {
-            width: 25,
-            height: 25
-        }
+        width: 25,
+        height: 25
     },
     active: {
-        color: '#0089c0',
+        color: '#0089c0!important',
     },
     itemText: {
         fontSize: 13,
-        color: '#bbb'
+        color: '#bbb',
+        textAlign: 'center'
     }
 }))
 

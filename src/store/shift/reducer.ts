@@ -1,10 +1,10 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { ShiftPayload } from "./types";
+import { EmployeePayload, ShiftPayload } from "./types";
 
 const now = new Date()
 const defaultStartDate = new Date(now.setHours(10, 0, 0, 0))
 const defaultEndDate = new Date(now.setHours(11, 0, 0, 0))
-const employees_mocks = [
+const employees_mocks: EmployeePayload[] = [
     {
         name: 'מתלמד',
         start: defaultStartDate,

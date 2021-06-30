@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './index.css'
 import StoreProvider from './store';
 import RTL from './rtl';
+import AppRouter from './router';
 
 ReactDOM.render(
   <StoreProvider>
     <RTL>
-      <App />
+      <AppRouter />
     </RTL>
   </StoreProvider>,
   document.getElementById('root')
