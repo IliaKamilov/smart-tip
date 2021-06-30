@@ -6,6 +6,7 @@ import EmployeesList from './components/EmployeeList'
 import SidePanel from './components/SidePanel'
 import WageForm from './components/WageForm'
 import { CalendarTodayRounded } from '@material-ui/icons'
+import { Link } from 'react-router-dom'
 
 const AppBarDate: React.FC<{ value?: Date }> = ({ value }) => {
     const date = value || new Date()
@@ -60,9 +61,9 @@ const App: React.FC = () => {
                         <EmployeesList />
                         <div className={classes.footer}>
                             <div style={{ direction: 'ltr', textAlign: 'center', fontSize: 11, color: '#999' }}>
-                                <a href="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</a> beta 1.2
+                                <Link to="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</Link> beta 1.2
                                 <div>
-                                    <a href="/contact" style={{ color: '#333', textDecoration: 'none' }}>Ilia Kamilov</a> {new Date().getFullYear()} ©
+                                    <Link to="/contact" style={{ color: '#333', textDecoration: 'none' }}>Ilia Kamilov</Link> {new Date().getFullYear()} ©
                                 </div>
                             </div>
                         </div>
