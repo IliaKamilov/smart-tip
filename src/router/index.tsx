@@ -9,9 +9,6 @@ const AppRouter: React.FC = ({ children }) => {
                 <Route exact path="/">
                     <App />
                 </Route>
-                <Route path="*">
-                    <div>Not found</div>
-                </Route>
             </Switch>
         </Router>
     )

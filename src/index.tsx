@@ -4,12 +4,12 @@ import reportWebVitals from './reportWebVitals';
 import './index.css'
 import StoreProvider from './store';
 import RTL from './rtl';
-import AppRouter from './router';
+import App from './App';
 
 ReactDOM.render(
   <StoreProvider>
     <RTL>
-      <AppRouter />
+      <App />
     </RTL>
   </StoreProvider>,
   document.getElementById('root')
