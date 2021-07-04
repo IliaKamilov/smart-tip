@@ -62,13 +62,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
         setState({ ...state, loading: false })
     }
 
-    const validateForm = () => {
-    }
-
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (Object.keys(state.errors).length > 0) return handleError('main', 'יש לתקן את השגיאות קודם.');
+        console.log(Object.keys(state.errors))
+        if (!state.errors.main && Object.keys(state.errors).length > 0) return handleError('main', 'יש לתקן את השגיאות קודם.');
 
         if (!input.name || !input.type || !input.start || !input.end) return handleError('main', 'יש לוודא שכל הפרטים הוזנו.')
 
@@ -116,7 +114,9 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
                 state.errors[target] = state.errors[target]?.filter(msg => msg !== 'ניתן להזין עד 20 תווים.') || state.errors[target]
             }
 
-            if (state.errors[target]?.length === 0) delete state.errors[target]
+            if (state.errors[target]?.length === 0) {
+                delete state.errors[target]
+            }
 
             setState({ ...state, loading: false })
         } else {
