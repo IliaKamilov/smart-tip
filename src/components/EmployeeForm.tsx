@@ -1,6 +1,6 @@
+import React from 'react'
 import { Icon, makeStyles, Button, TextField, Theme, CircularProgress, IconButton, Typography } from '@material-ui/core'
 import { Check, CloseRounded, ScheduleRounded } from '@material-ui/icons'
-import React from 'react'
 import { Employee, EmployeePayload } from '../store/shift/types'
 import { EnterIcon, LeaveIcon } from './EmployeeItem'
 import NumberPad from './NumberPad'
@@ -18,14 +18,26 @@ interface EmployeeFormProps {
     onSuccess?: () => void
 }
 
+type EmployeeErrorKeys = keyof EmployeePayload | 'main'
+
+interface EmployeeFormInput extends EmployeePayload {
+}
+
+interface EmployeeFormState {
+    loading: boolean
+    errors: {
+        [key in keyof EmployeePayload | 'main']?: string[]
+    }
+}
+
 const date = new Date()
 date.setHours(0, 0, 0, 0)
 
 const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCancel }) => {
     const classes = useStyles()
-    const { employees } = useAppSelector(state => state.shift)
     const dispatch = useAppDispatch()
-    const [input, setInput] = React.useState<EmployeePayload>({
+    const { employees } = useAppSelector(state => state.shift)
+    const [input, setInput] = React.useState<EmployeeFormInput>({
         name: employee?.name || '',
         start: employee?.start || date,
         end: employee?.end || date,
@@ -33,20 +45,36 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
         type: employee?.type || 'מלצר'
     })
 
-    const [state, setState] = React.useState<{ loading: boolean, errors: { target: keyof EmployeePayload, text: string }[], mainError?: string }>({ loading: false, errors: [] })
+    const [state, setState] = React.useState<EmployeeFormState>({ loading: false, errors: {} })
+
+    const handleError = (source: EmployeeErrorKeys, message: string) => {
+        const target = state.errors[source]
+        if (target) {
+            if (target.find(e => e === message)) return
+
+            target.push(message)
+        }
+
+        if (!target) {
+            state.errors[source] = [message]
+        }
+
+        setState({ ...state, loading: false })
+    }
+
+    const validateForm = () => {
+    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (state.errors.length > 0) return setState({ ...state, mainError: 'יש לתקן את השגיאות קודם.' })
+        if (Object.keys(state.errors).length > 0) return handleError('main', 'יש לתקן את השגיאות קודם.');
 
-        if (!input.name || !input.type || !input.start || !input.end) return setState({ loading: false, errors: [], mainError: 'יש לוודא שכל הפרטים הוזנו.' })
+        if (!input.name || !input.type || !input.start || !input.end) return handleError('main', 'יש לוודא שכל הפרטים הוזנו.')
 
-        if (getHours().before === 0) return setState({ loading: false, errors: [], mainError: 'אין אפשרות להוסיף עובד עם 0 שעות.' })
+        if (getHours().before === 0) return handleError('main', 'אין אפשרות להוסיף עובד עם 0 שעות.')
 
-        if (!employee && employees.find(e => e.name === input.name)) return setState({ loading: false, errors: [], mainError: `"${input.name}" כבר קיים ברשימה.` })
-
-        setState({ loading: true, errors: [] })
+        if (!employee && employees.find(e => e.name === input.name)) return handleError('main', `"${input.name}" כבר קיים ברשימה.`)
 
         setTimeout(() => {
             if (employee) {
@@ -55,7 +83,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
                     dispatch(action)
                     return onSuccess?.()
                 } else {
-                    return setState({ loading: false, errors: [], mainError: 'משהו השתבש יש לנסות שוב.' })
+                    return handleError('main', 'משהו השתבש יש לנסות שוב.')
                 }
             }
             dispatch(addEmployee(input))
@@ -64,25 +92,35 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
     }
 
     const handleChange = <T extends keyof EmployeePayload, V extends EmployeePayload[T]>(target: T, value: V) => {
-        const isError = state.errors.find(e => e.target === target)
+        if (['name', 'type'].includes(target) && typeof value === 'string') {
+            setInput({ ...input, [target]: value.replaceAll(/\s\s+/g, ' ').substr(0, 20) })
 
-        if (isError) {
-            setState({ ...state, errors: state.errors.filter(e => e.target !== target) })
-        }
-
-        setInput({ ...input, [target]: value })
-
-        if (['name', 'type'].includes(target)) {
             if (value === '') {
-                state.errors = state.errors.filter(e => e.target !== target)
-                return setState({ ...state, errors: [...state.errors, { target, text: 'שדה חובה.' }] })
+                delete state.errors[target]
+                return handleError(target, 'שדה חובה.')
+            } else {
+                state.errors[target] = state.errors[target]?.filter(msg => msg !== 'שדה חובה.') || state.errors[target]
             }
-            const regex = new RegExp(/^[a-zA-Zא-ת]+$/)
+
+            const regex = new RegExp(/^[a-zA-Zא-ת ]+$/)
 
             if (!regex.test(value as string)) {
-                state.errors = state.errors.filter(e => e.target !== target)
-                return setState({ ...state, errors: [...state.errors, { target, text: 'שדה זה יכול להכיל אותיות בלבד.' }] })
+                handleError(target, 'שדה זה יכול להכיל אותיות בלבד.')
+            } else {
+                state.errors[target] = state.errors[target]?.filter(msg => msg !== 'שדה זה יכול להכיל אותיות בלבד.') || state.errors[target]
             }
+
+            if (value.toString().length > 20) {
+                handleError(target, 'ניתן להזין עד 20 תווים.')
+            } else {
+                state.errors[target] = state.errors[target]?.filter(msg => msg !== 'ניתן להזין עד 20 תווים.') || state.errors[target]
+            }
+
+            if (state.errors[target]?.length === 0) delete state.errors[target]
+
+            setState({ ...state, loading: false })
+        } else {
+            setInput({ ...input, [target]: value })
         }
     }
 
@@ -128,7 +166,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
         const target = e.currentTarget.querySelector('input')
 
         if (e.key === 'Enter' && target?.name === 'name') {
-            if (target.value === '') return setState({ loading: false, errors: [...state.errors, { target: 'name', text: 'חובה להזין שם עובד' }] })
+            if (target.value === '') return handleChange('name', target.value)
 
             if (!employee) return next?.focus()
 
@@ -137,7 +175,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
         }
         if (e.key === 'Enter' && target?.name === 'type') {
             if (target.value === '') {
-                return setState({ ...state, errors: [...state.errors, { target: 'type', text: 'יש להזין תפקיד. דוגמה: מלצר, ברמן' }] })
+                return handleChange('type', target.value)
             }
 
             e.preventDefault()
@@ -164,7 +202,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
                 </IconButton>
             </div>
             {
-                state.mainError && <Alert className={classes.mainError} severity="error">{state.mainError}</Alert>
+                state.errors.main && <Alert className={classes.mainError} severity="error">{state.errors.main}</Alert>
             }
             <div className={classes.field}>
                 <TextField
@@ -179,12 +217,12 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
                     onChange={e => handleChange('name', e.currentTarget.value)}
                     autoFocus
                     onKeyPress={handleKeyUp}
-                    error={Boolean(state.errors?.find(e => e.target === 'name'))}
+                    error={Boolean(state.errors?.name)}
                     helperText={
                         <>
                             {
-                                state.errors.filter(e => e.target === 'name').map((error, i) => (
-                                    <b key={i}>* {error.text}<br /></b>
+                                state.errors.name && state.errors.name.map((error, i) => (
+                                    <b key={i}>* {error}<br /></b>
                                 ))
                             }
                         </>
@@ -205,12 +243,12 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
                     required
                     value={input.type}
                     onKeyPress={handleKeyUp}
-                    error={Boolean(state.errors?.find(e => e.target === 'type'))}
+                    error={Boolean(state.errors.type)}
                     helperText={
                         <>
                             {
-                                state.errors.filter(e => e.target === 'type').map((error, i) => (
-                                    <b key={i}>* {error.text}<br /></b>
+                                state.errors.type && state.errors.type.map((error, i) => (
+                                    <b key={i}>* {error}<br /></b>
                                 ))
                             }
                         </>
@@ -287,7 +325,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
-        overflow: 'hidden',
+        overflowX: 'hidden',
         outline: 'none',
         boxSizing: 'border-box',
         [theme.breakpoints.up(400)]: {

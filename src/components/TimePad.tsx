@@ -72,6 +72,7 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
                 setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
                 return setEditing('min')
             }
+
             let value = Number(e.currentTarget.value)
             let currentValue = Number(time[0])
             let newValue = Number(`${currentValue}${value}`)
@@ -186,7 +187,7 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
                                         pad === CONFIRM && <Done fontSize="inherit" />
                                     }
                                     {
-                                        pad === CLEAR && pad[0]
+                                        pad === CLEAR && 'C'
                                     }
                                 </button>
                             ))
