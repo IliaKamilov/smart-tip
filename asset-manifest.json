@@ -1,23 +1,23 @@
 {
   "files": {
     "main.css": "/smart-tip/static/css/main.a621c0b2.chunk.css",
-    "main.js": "/smart-tip/static/js/main.371170a4.chunk.js",
-    "main.js.map": "/smart-tip/static/js/main.371170a4.chunk.js.map",
+    "main.js": "/smart-tip/static/js/main.fb98210a.chunk.js",
+    "main.js.map": "/smart-tip/static/js/main.fb98210a.chunk.js.map",
     "runtime-main.js": "/smart-tip/static/js/runtime-main.9dd8d033.js",
     "runtime-main.js.map": "/smart-tip/static/js/runtime-main.9dd8d033.js.map",
-    "static/js/2.54d72e2b.chunk.js": "/smart-tip/static/js/2.54d72e2b.chunk.js",
-    "static/js/2.54d72e2b.chunk.js.map": "/smart-tip/static/js/2.54d72e2b.chunk.js.map",
+    "static/js/2.c38aabfa.chunk.js": "/smart-tip/static/js/2.c38aabfa.chunk.js",
+    "static/js/2.c38aabfa.chunk.js.map": "/smart-tip/static/js/2.c38aabfa.chunk.js.map",
     "static/js/3.8c6c2fd4.chunk.js": "/smart-tip/static/js/3.8c6c2fd4.chunk.js",
     "static/js/3.8c6c2fd4.chunk.js.map": "/smart-tip/static/js/3.8c6c2fd4.chunk.js.map",
     "index.html": "/smart-tip/index.html",
     "static/css/main.a621c0b2.chunk.css.map": "/smart-tip/static/css/main.a621c0b2.chunk.css.map",
-    "static/js/2.54d72e2b.chunk.js.LICENSE.txt": "/smart-tip/static/js/2.54d72e2b.chunk.js.LICENSE.txt",
+    "static/js/2.c38aabfa.chunk.js.LICENSE.txt": "/smart-tip/static/js/2.c38aabfa.chunk.js.LICENSE.txt",
     "static/media/percentage.a11cd316.svg": "/smart-tip/static/media/percentage.a11cd316.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.9dd8d033.js",
-    "static/js/2.54d72e2b.chunk.js",
+    "static/js/2.c38aabfa.chunk.js",
     "static/css/main.a621c0b2.chunk.css",
-    "static/js/main.371170a4.chunk.js"
+    "static/js/main.fb98210a.chunk.js"
   ]
 }
