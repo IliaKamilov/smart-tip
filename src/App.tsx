@@ -61,7 +61,7 @@ const App: React.FC = () => {
                         <EmployeesList />
                         <div className={classes.footer}>
                             <div style={{ direction: 'ltr', textAlign: 'center', fontSize: 11, color: '#999' }}>
-                                <Link to="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</Link> beta 1.2
+                                <Link to="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</Link> beta 1.2.1
                                 <div>
                                     <Link to="/contact" style={{ color: '#333', textDecoration: 'none' }}>Ilia Kamilov</Link> {new Date().getFullYear()} ©
                                 </div>

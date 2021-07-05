@@ -1,6 +1,6 @@
 {
-  "name": "client",
-  "version": "0.1.0",
+  "name": "smart-tip",
+  "version": "1.2.1",
   "homepage": "http://iliakamilov.github.io/smart-tip",
   "private": true,
   "dependencies": {
