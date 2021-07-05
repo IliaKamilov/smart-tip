@@ -25,7 +25,7 @@ const AppBarDate: React.FC<{ value?: Date }> = ({ value }) => {
             <IconButton
                 onClick={handleOpen}
                 size="small"
-                style={{ margin: '0 11px', position: 'absolute' }}
+                style={{ margin: '0 11px', position: 'relative', minWidth: 55 }}
             >
                 <CalendarTodayRounded style={{ width: 35, height: 35, color: '#999' }} />
                 <div style={{ position: 'absolute', fontSize: 14, fontWeight: 700, bottom: 7, color: '#999' }}>
