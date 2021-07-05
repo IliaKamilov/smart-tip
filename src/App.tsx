@@ -60,8 +60,10 @@ const App: React.FC = () => {
                     <div className={classes.content}>
                         <EmployeesList />
                         <div className={classes.footer}>
-                            <div style={{ direction: 'ltr', textAlign: 'center', fontSize: 11, color: '#999' }}>
-                                <Link to="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</Link> beta 1.2.1
+                            <div style={{ justifyContent: 'space-between', width: '100%', padding: '0 8px', direction: 'ltr', textAlign: 'center', display: 'flex', flexDirection: 'row', alignItems: 'space-between', fontSize: 11, color: '#999' }}>
+                                <div>
+                                    <Link to="/about" style={{ color: '#333', textDecoration: 'none' }}>Smart Tip</Link> beta 1.2.1
+                                </div>
                                 <div>
                                     <Link to="/contact" style={{ color: '#333', textDecoration: 'none' }}>Ilia Kamilov</Link> {new Date().getFullYear()} ©
                                 </div>
