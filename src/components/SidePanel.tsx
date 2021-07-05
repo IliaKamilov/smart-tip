@@ -44,25 +44,25 @@ const SidePanel: React.FC = () => {
         },
         {
             title: 'שעות',
-            value: shift.hours.toFixed(2),
+            value: shift.hours.toLocaleString('en-US', { maximumFractionDigits: 2 }),
             icon: <ScheduleOutlined />,
             label: 'סה"כ שעות משמרת'
         },
         {
             title: 'מזומן',
-            value: shift.perhour.cash.toFixed(2),
+            value: shift.perhour.cash.toLocaleString('en-US', { maximumFractionDigits: 2 }),
             icon: <LocalAtmOutlined />,
             label: 'מזומן לשעה'
         },
         {
             title: 'אשראי',
-            value: shift.perhour.credit.toFixed(2),
+            value: shift.perhour.credit.toLocaleString('en-US', { maximumFractionDigits: 2 }),
             icon: <CreditCardOutlined />,
             label: 'אשראי לשעה'
         },
         {
             title: 'סה"כ',
-            value: (shift.perhour.cash + shift.perhour.credit).toFixed(2),
+            value: (shift.perhour.cash + shift.perhour.credit).toLocaleString('en-US', { maximumFractionDigits: 2 }),
             icon: <AlarmOnOutlined />,
             label: 'סה"כ מזומן ואשראי'
         }
@@ -92,7 +92,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         userSelect: 'none',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        minWidth: '75px'
     },
     item: {
         display: 'flex',

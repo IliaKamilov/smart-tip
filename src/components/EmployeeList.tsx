@@ -51,8 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        overflowY: 'auto',
-        overflowX: 'hidden',
+        overflow: 'auto',
         width: '100%',
     },
     container: {

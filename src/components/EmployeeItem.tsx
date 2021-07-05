@@ -213,7 +213,7 @@ const EmployeeItem: React.FC<EmployeeItemProps> = ({ employee }) => {
                             <Detail label={`שעות עובד בחישוב ${employee.percent}%`}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <ScheduleRounded style={{ height: 31, color: '#999' }} />
-                                    <span style={{ color: '#333' }}>{employee.hours.toFixed(2)}</span>
+                                    <span style={{ color: '#333' }}>{employee.hours.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
                                 </div>
                             </Detail>
                         </div>
@@ -221,21 +221,21 @@ const EmployeeItem: React.FC<EmployeeItemProps> = ({ employee }) => {
                             <Detail label={`סה"כ מזומן ל${employee.name}`}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <LocalAtmRounded style={{ height: 31, color: '#0089c0' }} />
-                                    <span style={{ color: '#333', fontSize: 16 }}>{employee.tip.cash.toFixed(2)}</span>
+                                    <span style={{ color: '#333', fontSize: 16 }}>{employee.tip.cash.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
                                     <span style={{ fontSize: 11, marginTop: -6, color: '#999' }}>מזומן</span>
                                 </div>
                             </Detail>
                             <Detail label={`סה"כ אשראי ל${employee.name}`}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <CreditCardRounded style={{ height: 31, color: '#0089c0' }} />
-                                    <span style={{ color: '#333', fontSize: 16 }}>{employee.tip.credit.toFixed(2)}</span>
+                                    <span style={{ color: '#333', fontSize: 16 }}>{employee.tip.credit.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
                                     <span style={{ fontSize: 11, marginTop: -6, color: '#999' }}>אשראי</span>
                                 </div>
                             </Detail>
                             <Detail label={`סה"כ אשראי ומזומן`}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <AccountBalanceWalletOutlined style={{ height: 31, color: '#0089c0' }} />
-                                    <span style={{ color: '#333', fontSize: 16 }}>{(employee.tip.cash + employee.tip.credit).toFixed(2)}</span>
+                                    <span style={{ color: '#333', fontSize: 16 }}>{(employee.tip.cash + employee.tip.credit).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
                                     <span style={{ fontSize: 11, marginTop: -6, color: '#999' }}>סה"כ</span>
                                 </div>
                             </Detail>
@@ -277,7 +277,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexDirection: 'column'
     },
     body: {
-        width: '100%',
         padding: theme.spacing(.5, 1),
         display: 'flex',
         flexDirection: 'column',
@@ -298,9 +297,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     fullWidth: {
         width: '100%',
+        [theme.breakpoints.down(315)]: {
+            width: 'auto'
+        }
     },
     spaceItems: {
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
+        [theme.breakpoints.down(315)]: {
+            flexDirection: 'column',
+            width: 'auto'
+        }
     },
     primaryText: {
         color: '#0089c0',

@@ -44,7 +44,7 @@ const employees_mocks: EmployeePayload[] = [
 
 const initialState: ShiftPayload | null = {
     date: new Date(),
-    employees: process.env.NODE_ENV === 'development' ? employees_mocks : [],
+    employees: [], // process.env.NODE_ENV === 'development' ? employees_mocks : [],
     tip: { cash: 0, credit: 0 },
     type: 'בוקר'
 }
@@ -59,7 +59,6 @@ const shiftReducer = createReducer(
             return state = { ...state, tip: action.wage }
         },
         ADD_EMPLOYEE: (state, action) => {
-            console.log(action)
             return state = { ...state, employees: [...state.employees, action.employee] }
         },
         UPDATE_EMPLOYEE: (state, action) => {

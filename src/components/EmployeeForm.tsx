@@ -65,7 +65,6 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        console.log(Object.keys(state.errors))
         if (!state.errors.main && Object.keys(state.errors).length > 0) return handleError('main', 'יש לתקן את השגיאות קודם.');
 
         if (!input.name || !input.type || !input.start || !input.end) return handleError('main', 'יש לוודא שכל הפרטים הוזנו.')
@@ -96,7 +95,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
             if (value === '') {
                 delete state.errors[target]
                 return handleError(target, 'שדה חובה.')
-            } else {
+            } else if (state.errors[target]) {
                 state.errors[target] = state.errors[target]?.filter(msg => msg !== 'שדה חובה.') || state.errors[target]
             }
 
@@ -104,13 +103,13 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
 
             if (!regex.test(value as string)) {
                 handleError(target, 'שדה זה יכול להכיל אותיות בלבד.')
-            } else {
+            } else if (state.errors[target]) {
                 state.errors[target] = state.errors[target]?.filter(msg => msg !== 'שדה זה יכול להכיל אותיות בלבד.') || state.errors[target]
             }
 
             if (value.toString().length > 20) {
                 handleError(target, 'ניתן להזין עד 20 תווים.')
-            } else {
+            } else if (state.errors[target]) {
                 state.errors[target] = state.errors[target]?.filter(msg => msg !== 'ניתן להזין עד 20 תווים.') || state.errors[target]
             }
 
@@ -124,9 +123,10 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ employee, onSuccess, onCanc
         }
     }
 
-    const handleTimeChange = (target: 'start' | 'end', value: [number, number, number, number]) => {
+    const handleTimeChange = (target: 'start' | 'end', value: string[]) => {
         const date = new Date()
-        date.setHours(...value)
+        date.setHours(Number(value[0]) || 0, Number(value[1]) || 0, 0, 0)
+
         handleChange(target, date)
 
         if (!employee && target === 'start') {

@@ -5,27 +5,27 @@ import clsx from 'clsx'
 
 interface TimePadProps {
     value?: string
-    onChange?: (value: [number, number, number, number]) => void
+    onChange?: (value: string[]) => void
     icon?: React.ReactNode
     label?: string
     id?: string
 }
 
 interface PadProps {
-    value?: [string, string]
+    value?: string[]
     label?: string
-    onConfirm?: (value: [string, string]) => void
+    onConfirm?: (value: string[]) => void
 }
 
 const BACKSPACE = 'Backspace'
 const CLEAR = 'Delete'
 const CONFIRM = 'Enter'
 
-const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
+const Pad: React.FC<PadProps> = ({ value: defaultValue, onConfirm, label }) => {
     const classes = useStyles()
-    const [time, setTime] = React.useState<[string, string]>(value || ['00', '00'])
-    const [editing, setEditing] = React.useState<'hour' | 'min'>('hour')
-    const [focus, setFocus] = React.useState<'hour' | 'min' | undefined>(undefined)
+    const [value, setValue] = React.useState<string[]>(defaultValue || ['00', '00'])
+    const [focus, setFocus] = React.useState<'hour' | 'min'>('hour')
+    const [index, setIndex] = React.useState<number>(0)
 
     const pad = [
         [1, 2, 3],
@@ -51,106 +51,87 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
     }
 
     const handlePadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        if (e.currentTarget.value === BACKSPACE) {
-            if (time[1]) {
-                setEditing('min')
-                time[1] = time[1].slice(0, -1)
-            } else {
-                setEditing('hour')
-                time[0] = time[0].slice(0, -1)
+        const padValue = e.currentTarget.value
+        const timeIndex = focus === 'hour' ? 0 : 1
+        const timeValue = value[timeIndex]
+
+        if (isNaN(Number(padValue))) {
+            switch (padValue) {
+                case CLEAR:
+                    return setValue(['', ''])
+                case BACKSPACE:
+                    value[timeIndex] = ''
+                    return setValue([...value])
+                case CONFIRM:
+                    return onConfirm?.(value)
             }
-            return setTime([time[0], time[1]])
+            return
         }
-        if (editing === 'hour') {
-            if (e.currentTarget.value === BACKSPACE) return setTime([time[0].slice(0, -1), time[1]])
-            if (e.currentTarget.value === CLEAR) return setTime(['', time[1]])
-            if (e.currentTarget.value === CONFIRM) {
-                if (time[0] === '') {
-                    setTime(['00', time[1] || '00'])
-                    return onConfirm?.(['00', time[1] || '00'])
-                }
-                setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
-                return setEditing('min')
-            }
 
-            let value = Number(e.currentTarget.value)
-            let currentValue = Number(time[0])
-            let newValue = Number(`${currentValue}${value}`)
+        console.log({ timeValue, padValue })
+        const padNumber = Number(padValue)
 
-            if (focus === 'hour') {
-                setFocus(undefined)
-                if (value > 2) {
-                    setEditing('min')
-                    return setTime([`0${value.toString()}`, time[1]])
-                }
-                return setTime([value.toString(), time[1]])
-            } else {
-                if (newValue === 24) {
-                    setEditing('min')
-                    return setTime(['00', time[1]])
+        switch (index) {
+            case 0:
+                if (padNumber > 2) {
+                    setValue([`0${padValue}`, value[1]])
+                    setFocus('min')
+                    setIndex(2)
+                    return
                 }
 
-                if (newValue > 24) {
-                    if (value <= 2) {
-                        return setTime([value.toString(), time[1]])
-                    }
-
-                    if (value > 2 && !focus) {
-                        setEditing('min')
-                        return setTime([value < 10 ? `0${value.toString()}` : value.toString(), time[1]])
-                    }
-
-                    if (value > 2) return console.log('asd')
+                setIndex(1)
+                setValue([padValue, value[1]])
+                return;
+            case 1:
+                if (Number(value[0] + padValue) === 24) {
+                    setValue(['00', value[1]])
+                    setIndex(2)
+                    setFocus('min')
+                    return
                 }
 
-                if (currentValue === 0 && value >= 3) {
-                    setEditing('min')
-                    return setTime([`0${value}`, time[1]])
+                if (Number(value[0] + padValue) > 24) return
+
+                setValue([`${value[0]}${padValue}`, value[1]])
+                setFocus('min')
+                setIndex(2)
+                return
+            case 2:
+                if (padNumber > 5) {
+                    setValue([value[0], `0${padValue}`])
+                    return
                 }
-
-                if (value === 0 && time[0] === '0') {
-                    setEditing('min')
-                    return setTime([`0${newValue.toString()}`, time[1]])
+                setValue([value[0], padValue])
+                setIndex(3)
+                return
+            case 3:
+                if (Number(`${value[1]}${padValue}`) > 59) {
+                    return console.log('error', Number(`${value[1]}${padValue}`))
                 }
-
-                if (newValue > 9) {
-                    setEditing('min')
-                }
-                setTime([newValue.toString(), time[1]])
-            }
-        }
-        if (editing === 'min') {
-            if (e.currentTarget.value === BACKSPACE) {
-                if (time[1] === '') setEditing('hour')
-                return setTime([time[0], time[1].slice(0, -1)])
-            }
-            if (e.currentTarget.value === CLEAR) return setTime([time[0], ''])
-            if (e.currentTarget.value === CONFIRM) {
-                time[0] = time[0] || '0'
-                time[1] = time[1] || '0'
-                setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
-                return onConfirm?.([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
-            }
-            let value = Number(e.currentTarget.value)
-            let currentValue = Number(time[1])
-            let newValue = Number(`${currentValue}${value}`)
-
-            if (newValue >= 60) {
-                return setTime([time[0], `0${value.toString()}`])
-            }
-
-            setTime([time[0], newValue.toString()])
-
-            if (newValue.toString().length === 2) {
-                onConfirm?.([time[0], newValue.toString()])
-            }
+                setValue([value[0], `${value[1]}${padValue}`])
+                onConfirm?.([value[0], `${value[1]}${padValue}`])
+                return
+            default:
+                return;
         }
     }
 
     const handleClick = (target: 'hour' | 'min') => {
         setFocus(target)
-        setEditing(target)
-        setTime([time[0].length === 1 ? `0${time[0]}` : time[0], time[1].length === 1 ? `0${time[1]}` : time[1]])
+        setIndex(target === 'hour' ? 0 : 2)
+
+        if (target === 'min') {
+            if (Number(value[0]) < 10 && value[0].length <= 1) {
+                setValue([`0${value[0] || 0}`, value[1]])
+            }
+        }
+
+        if (target === 'hour') {
+            if (Number(value[1]) < 10 && value[1].length <= 1) {
+                setValue([value[0], `0${value[1] || 0}`])
+            }
+        }
     }
 
     return (
@@ -158,9 +139,9 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
             <div className={classes.padRow}>
                 <div className={classes.padInput}>
                     <div style={{ direction: 'ltr', display: 'flex' }}>
-                        <div onClick={() => handleClick('hour')} style={{ background: editing === 'hour' ? '#efefef' : 'transparent' }}>{time[0]}</div>
+                        <div onClick={() => handleClick('hour')} style={{ background: focus === 'hour' ? '#efefef' : 'transparent' }}>{value[0]}</div>
                         :
-                        <div onClick={() => handleClick('min')} style={{ background: editing === 'min' ? '#efefef' : 'transparent' }}>{time[1]}</div>
+                        <div onClick={() => handleClick('min')} style={{ background: focus === 'min' ? '#efefef' : 'transparent' }}>{value[1]}</div>
                     </div>
                     <div className={classes.padLabel}>{label}</div>
                 </div>
@@ -201,25 +182,18 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, label }) => {
 
 const TimePad: React.FC<TimePadProps> = ({ value, onChange, icon, label, id }) => {
     const classes = useStyles()
-    const [time, setTime] = React.useState<[string, string]>(value?.split(':') as [string, string] || ['00', '00'])
     const [anchor, setAnchor] = React.useState<HTMLElement | null>(null)
 
     const handleOpen = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget)
     const handleClose = () => setAnchor(null)
 
-    const handleTimeConfirm = (value: [string, string]) => {
-        setTime(value)
-        handleChange(value)
+    const handleTimeConfirm = (value: string[]) => {
+        onChange?.(value)
         handleClose()
     }
 
-    const handleChange = (value?: [string, string]) => {
-        const t = value ? value.map(str => Number(str)) : [Number(time[0]), Number(time[1])]
-        const hours: [number, number, number, number] = [t[0], t[1], 0, 0]
-        onChange?.(hours)
-    }
-
     const open = Boolean(anchor)
+    const time = value?.split(':') || ['00', '00']
 
     return (
         <div className={classes.root}>
