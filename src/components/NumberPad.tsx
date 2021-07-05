@@ -148,7 +148,7 @@ const NumberPad: React.FC<NumberPadProps> = ({ value, onChange, max, label, icon
             >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     {icon}
-                    <div>{input.toLocaleString()}</div>
+                    <div>{input.toLocaleString('en-US', { maximumFractionDigits: 2 })}</div>
                     {label && <span className={classes.label}>{label}</span>}
                 </div>
             </Button>
