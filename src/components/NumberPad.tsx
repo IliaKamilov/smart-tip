@@ -61,11 +61,12 @@ const Pad: React.FC<PadProps> = ({ value, onConfirm, max, label }) => {
             case CONFIRM:
                 return onConfirm?.(Number(input))
             case '.':
+                if (input.includes('.')) return
                 return setInput(`${input}.`)
             default:
                 if (Number(input + e.currentTarget.value) > max) return setInput(max.toString())
-
-                return setInput(Number(input + e.currentTarget.value).toString())
+                if (input === '0') return setInput(e.currentTarget.value)
+                return setInput(input + e.currentTarget.value)
         }
     }
 
@@ -182,10 +183,12 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid #efefef',
+        maxWidth: `calc(75px * 3)`
     },
     padOuter: {
     },
     padRow: {
+        position: 'relative',
         display: 'flex',
         flexDirection: 'row-reverse',
         '&:not(:last-child)': {
@@ -219,7 +222,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         position: 'relative',
         alignItems: 'flex-end',
         fontSize: 24,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        maxWidth: '60%',
+        outline: 'none',
+        overflow: 'hidden'
     },
     padMax: {
         position: 'absolute',
@@ -233,7 +239,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         background: 'transparent',
         color: '#999',
         fontSize: 24,
-        outline: 'none'
+        outline: 'none',
     },
     confirmItem: {
         color: theme.palette.info.main,
